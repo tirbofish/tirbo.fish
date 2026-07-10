@@ -1,8 +1,14 @@
+import { useEffect, useState } from "react";
 import { githubUrl, email, linkedinUrl } from "./site";
 import { About } from "./About";
 import { Projects } from "./Projects";
 import { Skills } from "./Skills";
 import TirboFish from "./TirboFish";
+import { FishingGame } from "./FishingGame";
+import { readHiScore } from "./hiScore";
+
+const WHEEL_PULL_TARGET = 600; // px of upward wheel scroll needed to hook the game
+const TOUCH_PULL_TARGET = 240; // px of downward drag at the top of the page
 
 const navLinks = [
     { label: "about", href: "#about" },
@@ -15,6 +21,83 @@ const navLinks = [
 ];
 
 export function Landing() {
+    const [gameOpen, setGameOpen] = useState(false);
+    const [hiScore, setHiScore] = useState(readHiScore);
+    const [pullProgress, setPullProgress] = useState(0);
+
+    useEffect(() => {
+        if (gameOpen) return;
+
+        let pull = 0;
+        let resetTimer = 0;
+        let touchStartY: number | null = null;
+
+        const setPull = (value: number) => {
+            pull = Math.max(value, 0);
+            setPullProgress(Math.min(pull / WHEEL_PULL_TARGET, 1));
+        };
+
+        const open = () => {
+            window.clearTimeout(resetTimer);
+            setPull(0);
+            setGameOpen(true);
+        };
+
+        const onWheel = (event: WheelEvent) => {
+            window.clearTimeout(resetTimer);
+            if (window.scrollY > 1 || event.deltaY >= 0) {
+                setPull(0);
+                return;
+            }
+            const px = event.deltaMode === 1 ? event.deltaY * 16 : event.deltaY;
+            setPull(pull - px);
+            if (pull >= WHEEL_PULL_TARGET) {
+                open();
+                return;
+            }
+            resetTimer = window.setTimeout(() => setPull(0), 600);
+        };
+
+        const onTouchStart = (event: TouchEvent) => {
+            touchStartY =
+                window.scrollY <= 1 ? event.touches[0].clientY : null;
+        };
+
+        const onTouchMove = (event: TouchEvent) => {
+            if (touchStartY === null || window.scrollY > 1) {
+                setPull(0);
+                return;
+            }
+            const dragged = event.touches[0].clientY - touchStartY;
+            setPull(dragged * (WHEEL_PULL_TARGET / TOUCH_PULL_TARGET));
+            if (pull >= WHEEL_PULL_TARGET) {
+                touchStartY = null;
+                open();
+            }
+        };
+
+        const onTouchEnd = () => {
+            touchStartY = null;
+            setPull(0);
+        };
+
+        window.addEventListener("wheel", onWheel, { passive: true });
+        window.addEventListener("touchstart", onTouchStart, { passive: true });
+        window.addEventListener("touchmove", onTouchMove, { passive: true });
+        window.addEventListener("touchend", onTouchEnd, { passive: true });
+        window.addEventListener("touchcancel", onTouchEnd, { passive: true });
+        return () => {
+            window.clearTimeout(resetTimer);
+            window.removeEventListener("wheel", onWheel);
+            window.removeEventListener("touchstart", onTouchStart);
+            window.removeEventListener("touchmove", onTouchMove);
+            window.removeEventListener("touchend", onTouchEnd);
+            window.removeEventListener("touchcancel", onTouchEnd);
+        };
+    }, [gameOpen]);
+
+    const pullBars = Math.round(pullProgress * 8);
+
     return (
         <div className="min-h-dvh bg-cream font-mono text-cocoa">
             <header className="fixed inset-x-0 top-0 z-20 animate-view-in motion-reduce:animate-none">
@@ -58,6 +141,41 @@ export function Landing() {
             <About />
             <Skills />
             <Projects />
+
+            {pullProgress > 0 && !gameOpen && (
+                <div
+                    className="pointer-events-none fixed inset-x-0 top-16 z-30 flex justify-center"
+                    aria-hidden="true"
+                >
+                    <span
+                        className="rounded-[0.15em] bg-cocoa px-3 py-1 font-mono text-xs text-cream"
+                        style={{ opacity: 0.4 + pullProgress * 0.6 }}
+                    >
+                        reel up to go fishin&apos; [{"=".repeat(pullBars)}
+                        {"\u00b7".repeat(8 - pullBars)}] ::&lt;&gt;
+                    </span>
+                </div>
+            )}
+
+            {hiScore > 0 && !gameOpen && (
+                <button
+                    className="fixed bottom-4 right-4 z-20 cursor-pointer border-0 bg-transparent p-0 font-mono text-xs text-inherit opacity-60 outline-offset-[0.35em] hover:underline hover:opacity-100 focus-visible:rounded-[0.15em] focus-visible:outline-2 focus-visible:outline-current"
+                    type="button"
+                    onClick={() => setGameOpen(true)}
+                    title="cast again"
+                >
+                    hi-score: {hiScore} ::&lt;&gt;
+                </button>
+            )}
+
+            {gameOpen && (
+                <FishingGame
+                    onExit={(hi) => {
+                        setHiScore(hi);
+                        setGameOpen(false);
+                    }}
+                />
+            )}
         </div>
     );
 }
