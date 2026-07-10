@@ -1,0 +1,127 @@
+@import "tailwindcss";
+
+@font-face {
+  font-family: "JetBrains Mono Nerd Font";
+  src: url("./assets/fonts/JetBrainsMonoNerdFont-Thin.ttf") format("truetype");
+  font-style: normal;
+  font-weight: 100;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "JetBrains Mono Nerd Font";
+  src: url("./assets/fonts/JetBrainsMonoNerdFont-Regular.ttf") format("truetype");
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "JetBrains Mono Nerd Font";
+  src: url("./assets/fonts/JetBrainsMonoNerdFont-Italic.ttf") format("truetype");
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "JetBrains Mono Nerd Font";
+  src: url("./assets/fonts/JetBrainsMonoNerdFont-SemiBoldItalic.ttf")
+    format("truetype");
+  font-style: italic;
+  font-weight: 600;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "JetBrains Mono Nerd Font";
+  src: url("./assets/fonts/JetBrainsMonoNerdFont-ExtraBoldItalic.ttf")
+    format("truetype");
+  font-style: italic;
+  font-weight: 800;
+  font-display: swap;
+}
+
+@theme static {
+  --color-cream: #fff4e6;
+  --color-cocoa: #3c2f2f;
+  --color-espresso: #4b3832;
+  --color-brick: #854442;
+  --color-latte: #be9b7b;
+}
+
+@theme {
+  --font-mono: "JetBrains Mono Nerd Font", "JetBrains Mono", monospace;
+  --animate-view-in: view-in 400ms ease-out both;
+  --animate-pulse-scale: pulse-scale 2000ms ease-in-out infinite;
+  --animate-fin: fin-wiggle var(--fin-speed, 900ms) ease-in-out infinite;
+}
+
+@keyframes fin-wiggle {
+  0%,
+  100% {
+    transform: translateY(0) rotate(0deg);
+  }
+
+  50% {
+    transform: translateY(-0.08em) rotate(16deg);
+  }
+}
+
+@keyframes pulse-scale {
+  0%,
+  100% {
+    scale: 1;
+  }
+
+  50% {
+    scale: 1.06;
+  }
+}
+
+@keyframes view-in {
+  from {
+    opacity: 0;
+    transform: translateY(0.5rem);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@layer base {
+  :root {
+    /* catppuccin latte accents for the css-variables icon set */
+    --vscode-ctp-red: #d20f39;
+    --vscode-ctp-peach: #fe640b;
+    --vscode-ctp-yellow: #df8e1d;
+    --vscode-ctp-blue: #1e66f5;
+    --vscode-ctp-sapphire: #209fb5;
+    --vscode-ctp-mauve: #8839ef;
+    --vscode-ctp-text: #4c4f69;
+  }
+
+  html,
+  body,
+  #root {
+    min-width: 320px;
+    min-height: 100%;
+    margin: 0;
+  }
+
+  body {
+    min-height: 100dvh;
+    color: var(--color-cream);
+    background: var(--color-cocoa);
+    font-synthesis: weight;
+    text-rendering: geometricPrecision;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    html {
+      scroll-behavior: smooth;
+    }
+  }
+}
