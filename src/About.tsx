@@ -1,16 +1,16 @@
-const birthYear = 2009; // born Jan 01, 2009
+import type { SiteConfig } from "./config";
 
-export function About() {
-    const age = new Date().getFullYear() - birthYear;
+export function About({ config }: { config: SiteConfig }) {
+    const birth = new Date(`${config.birthDate}T00:00:00`);
+    const today = new Date();
+    let age = today.getFullYear() - birth.getFullYear();
+    if (today.getMonth() < birth.getMonth() || (today.getMonth() === birth.getMonth() && today.getDate() < birth.getDate())) age--;
 
     return (
-        <section id="about" className="mx-auto max-w-3xl scroll-mt-24 px-6 py-24">
-            <h1 className="m-0 text-2xl leading-none tracking-[-0.08em]">
-                # about
-            </h1>
-            <p className="mt-8 text-sm leading-relaxed opacity-80">
-                I&apos;m a {age} year old student software developer interested
-                in systems, graphics, game dev and full-stack apps.
+        <section id="about" className="mx-auto max-w-3xl scroll-mt-16 px-6 py-24">
+            <h1 className="m-0 text-2xl leading-none tracking-[-0.08em]"># about</h1>
+            <p className="mt-8 whitespace-pre-line text-sm leading-relaxed opacity-80">
+                {config.about.replaceAll("{age}", String(age))}
             </p>
         </section>
     );

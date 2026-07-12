@@ -1,12 +1,19 @@
 import { useEffect, useState } from 'react'
 import './App.css'
 import { Landing } from './Landing'
+import { loadSiteConfig, type SiteConfig } from './config'
 
 const viewRevealDelay = 700
 
 function App() {
   const [isExpanding, setIsExpanding] = useState(false)
   const [hasEntered, setHasEntered] = useState(false)
+  const [config, setConfig] = useState<SiteConfig | null>(null)
+  const [configError, setConfigError] = useState(false)
+
+  useEffect(() => {
+    loadSiteConfig().then(setConfig).catch(() => setConfigError(true))
+  }, [])
 
   useEffect(() => {
     if (!isExpanding) return
@@ -22,8 +29,12 @@ function App() {
     return () => window.clearTimeout(timeout)
   }, [isExpanding])
 
-  if (hasEntered) {
-    return <Landing />
+  if (configError) {
+    return <main className="grid min-h-dvh place-items-center bg-cocoa p-8 font-mono text-cream">Could not read site-config.json</main>
+  }
+
+  if (hasEntered && config) {
+    return <Landing config={config} />
   }
 
   return (
@@ -58,7 +69,7 @@ function App() {
           }`}
           aria-hidden="true"
         >
-          ::&lt;tirbofish&gt;
+          {config?.handle ?? '::<tirbofish>'}
         </span>
         <span
           className={`relative z-10 [grid-area:1/1] whitespace-nowrap text-[clamp(1.55rem,5vw,3rem)] leading-none tracking-[0.02em] text-cocoa transition-[opacity,translate] duration-300 ease-out motion-reduce:transition-none ${
@@ -68,7 +79,7 @@ function App() {
           }`}
           aria-hidden="true"
         >
-          Thribhu K
+          {config?.name ?? 'Loading...'}
         </span>
       </button>
     </main>

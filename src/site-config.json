@@ -1,0 +1,29 @@
+{
+  "name": "Thribhu K",
+  "handle": "::<tirbofish>",
+  "birthDate": "2009-01-01",
+  "about": "I'm a {age} year old student software developer interested in systems, graphics, game dev and full-stack apps.",
+  "links": {
+    "github": "https://github.com/tirbofish",
+    "linkedin": "https://www.linkedin.com/in/thribhu-krishnan-1a3b60333/",
+    "email": "thribhu.krishnan@proton.me",
+    "resume": "/resume.pdf"
+  },
+  "fishing": { "resistance": 1e+24 },
+  "skills": ["rust", "zig", "python", "typescript", "kotlin", "c#", "unreal engine", "c++"],
+  "skillGroups": [
+    { "name": "frameworks", "items": ["ue5", "react", "vite", "flask"] },
+    { "name": "graphics and systems", "items": ["vulkan", "directx 11 + 12", "webgpu"] },
+    { "name": "infrastructure", "items": ["docker", "linux", "github actions", "digitalocean"] }
+  ],
+  "featuredProjects": [
+    { "name": "dropbear", "description": "A game engine written in Rust and scripted in Kotlin. ", "link": "https://github.com/tirbofish/dropbear", "screenshot": "" },
+    { "name": "proton-sdk-rs2", "description": "Reverse-engineered the proton drive sdk and ported it to rust, then used it as a FUSE sync client for Linux. ", "link": "https://github.com/tirbofish/proton-sdk-rs2", "screenshot": "" },
+    { "name": "Thribhu's Past Paper Repository", "description": "Originally a submission task for my Software Engineering HSC course, it allows students to submit past papers and share to friends, like a social network.", "link": "https://github.com/tirbofish/tppr", "screenshot": "" }
+  ],
+  "otherProjects": [
+    { "name": "PhaseSwap", "description": "A game built in Unreal Engine about a mutated rabbit - that can change between gas, liquid and solid - escapes the laboratory.\n\nThis was submitted for my HSC Multimedia Major Project.", "link": "https://github.com/tirbofish/RabbitLabGame" },
+    { "name": "vitellus", "description": "A Zig-native render hardware interface.\n\nBuilt for the eggyengine project", "link": "https://github.com/eggyengine/vitellus" },
+    { "name": "humpty", "description": "A physics engine written in zig.\n\nBuilt for the eggyengine project.", "link": "https://github.com/eggyengine/humpty" }
+  ]
+}

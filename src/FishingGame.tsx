@@ -42,6 +42,9 @@ const BOAT = ['    o _______', "   /|\\/", ' __/_\\_____', ' \\_________/']
 const ROD_TIP_OFFSET = 12 // column of the fishing line, relative to the boat
 
 const WATERLINE = 8
+const SINK_ACCELERATION = 20
+const FAST_SINK_ACCELERATION = 30
+const MAX_SINK_SPEED = 11
 
 const clamp = (v: number, min: number, max: number) =>
   Math.min(Math.max(v, min), max)
@@ -90,7 +93,7 @@ function spawnSwimmer(cols: number, rows: number): Swimmer {
   }
 }
 
-export function FishingGame({ onExit }: { onExit: (hi: number) => void }) {
+export function FishingGame({ onExit, resistance }: { onExit: (hi: number) => void; resistance: number }) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const onExitRef = useRef(onExit)
   onExitRef.current = onExit
@@ -102,6 +105,11 @@ export function FishingGame({ onExit }: { onExit: (hi: number) => void }) {
     if (!canvas || !ctx) return
 
     const isTouch = window.matchMedia('(pointer: coarse)').matches
+    const safeResistance = Number.isFinite(resistance) && resistance > 0
+      ? Math.max(resistance, 0.000001)
+      : 3
+    const reelAcceleration = -36 / safeResistance
+    const maxReelSpeed = -15 / safeResistance
 
     const { overflow } = document.body.style
     document.body.style.overflow = 'hidden'
@@ -217,9 +225,9 @@ export function FishingGame({ onExit }: { onExit: (hi: number) => void }) {
 
       if (game.mode === 'play') {
         // hook physics: rises while holding up, sinks otherwise
-        game.hookVy += (game.up ? -34 : 15) * dt
-        if (game.down) game.hookVy += 26 * dt
-        game.hookVy = clamp(game.hookVy, -13, 10)
+        game.hookVy += (game.up ? reelAcceleration : SINK_ACCELERATION) * dt
+        if (game.down) game.hookVy += FAST_SINK_ACCELERATION * dt
+        game.hookVy = clamp(game.hookVy, maxReelSpeed, MAX_SINK_SPEED)
         game.hookY += game.hookVy * dt
         const minY = WATERLINE + 1
         const maxY = seafloor() - 0.4
@@ -448,7 +456,7 @@ export function FishingGame({ onExit }: { onExit: (hi: number) => void }) {
       window.removeEventListener('resize', measure)
       document.body.style.overflow = overflow
     }
-  }, [])
+  }, [resistance])
 
   return (
     <div

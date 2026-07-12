@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Local site editor</title>
+  <style>
+    :root { font-family: ui-monospace, SFMono-Regular, Consolas, monospace; color: #302626; background: #f7ecdd; }
+    * { box-sizing: border-box; }
+    body { margin: 0; }
+    header { position: sticky; top: 0; z-index: 2; display: flex; flex-wrap: wrap; align-items: center; gap: .65rem; padding: 1rem max(1rem, calc((100% - 980px)/2)); background: #3c2f2f; color: #fff4e6; }
+    header strong { margin-right: auto; }
+    button { font: inherit; cursor: pointer; border: 1px solid currentColor; border-radius: 5px; padding: .55rem .8rem; background: transparent; color: inherit; }
+    button.primary { background: #fff4e6; color: #3c2f2f; }
+    main { max-width: 980px; margin: auto; padding: 1.25rem; }
+    .notice { padding: .8rem 1rem; border-left: 4px solid #854442; background: #fff8ee; line-height: 1.5; }
+    section { margin: 1rem 0; padding: 1rem; border: 1px solid #d5c1ac; border-radius: 7px; background: #fffaf3; }
+    h2 { margin: 0 0 1rem; font-size: 1rem; }
+    .grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .9rem; }
+    label { display: grid; gap: .35rem; font-size: .8rem; color: #655454; }
+    label.wide { grid-column: 1 / -1; }
+    input, textarea { width: 100%; border: 1px solid #c7ad93; border-radius: 4px; padding: .65rem; background: white; color: #302626; font: inherit; font-size: .9rem; }
+    textarea { min-height: 5rem; resize: vertical; }
+    .row { display: grid; grid-template-columns: 1fr 2fr 1fr 1fr auto; gap: .6rem; margin: .6rem 0; align-items: end; }
+    .row.simple { grid-template-columns: 1fr 2fr auto; }
+    .row.project { grid-template-columns: 1fr 2fr 1fr auto; }
+    .remove { color: #8b2525; height: 2.45rem; }
+    .add { margin-top: .5rem; color: #3c2f2f; }
+    #status { min-width: 11rem; font-size: .8rem; opacity: .85; }
+    @media (max-width: 700px) { .grid, .row, .row.simple { grid-template-columns: 1fr; } .remove { width: max-content; } }
+  </style>
+</head>
+<body>
+  <header>
+    <strong>site-config editor</strong>
+    <span id="status">Ready</span>
+    <button id="open">Open JSON</button>
+    <button id="save" class="primary">Save JSON</button>
+  </header>
+  <main>
+    <p class="notice">Edit the fields, then save as <b>site-config.json</b> inside the website's <b>src</b> folder. Use “Open JSON” first if you want to update your current file.</p>
+    <section><h2>Identity</h2><div class="grid">
+      <label>Name<input data-path="name"></label><label>Handle<input data-path="handle"></label>
+      <label>Birth date<input type="date" data-path="birthDate"></label>
+      <label class="wide">About text <small>Use {age} to insert your current age.</small><textarea data-path="about"></textarea></label>
+    </div></section>
+    <section><h2>Links</h2><div class="grid">
+      <label>GitHub<input data-path="links.github"></label><label>LinkedIn<input data-path="links.linkedin"></label>
+      <label>Email<input type="email" data-path="links.email"></label><label>Resume path<input data-path="links.resume"></label>
+    </div></section>
+    <section><h2>Fishing game</h2><div class="grid">
+      <label>Reeling resistance <small>Higher = harder/slower. Any positive number is allowed.</small><input type="number" min="0.000001" step="any" data-path="fishing.resistance"></label>
+    </div></section>
+    <section><h2>Skills</h2><label>Skills, separated by commas<input id="skills"></label><div id="groups"></div><button class="add" data-add="group">+ skill group</button></section>
+    <section><h2>Featured projects</h2><div id="featured"></div><button class="add" data-add="featured">+ featured project</button></section>
+    <section><h2>Other projects</h2><div id="other"></div><button class="add" data-add="other">+ project</button></section>
+  </main>
+  <script>
+    let fileHandle;
+    let data = {
+      name: "Thribhu K", handle: "::<tirbofish>", birthDate: "2009-01-01",
+      about: "I'm a {age} year old student software developer interested in systems, graphics, game dev and full-stack apps.",
+      links: { github: "https://github.com/tirbofish", linkedin: "https://www.linkedin.com/in/thribhu-krishnan-1a3b60333/", email: "thribhu.krishnan@proton.me", resume: "/resume.pdf" },
+      fishing: { resistance: 3 },
+      skills: ["rust", "zig", "python", "typescript", "kotlin", "c#", "unreal engine", "c++"],
+      skillGroups: [
+        { name: "frameworks", items: ["ue5", "react", "vite", "flask"] },
+        { name: "graphics and systems", items: ["vulkan", "directx 11 + 12", "webgpu"] },
+        { name: "infrastructure", items: ["docker", "linux", "github actions", "digitalocean"] }
+      ],
+      featuredProjects: [
+        { name: "project-one", description: "A short description of the project goes here.", link: "", screenshot: "" },
+        { name: "project-two", description: "A short description of the project goes here.", link: "", screenshot: "" },
+        { name: "project-three", description: "A short description of the project goes here.", link: "", screenshot: "" }
+      ],
+      otherProjects: [
+        { name: "project-four", description: "One-liner about it.", link: "" },
+        { name: "project-five", description: "One-liner about it.", link: "" },
+        { name: "project-six", description: "One-liner about it.", link: "" },
+        { name: "project-seven", description: "One-liner about it.", link: "" }
+      ]
+    };
+    const $ = (s) => document.querySelector(s);
+    const esc = (s = "") => String(s).replaceAll("&", "&amp;").replaceAll('"', "&quot;").replaceAll("<", "&lt;");
+    const status = (message) => { $("#status").textContent = message; };
+    const get = (path) => path.split(".").reduce((value, key) => value?.[key], data) ?? "";
+    const set = (path, value) => { const keys = path.split("."); let target = data; keys.slice(0, -1).forEach(k => target = target[k]); target[keys.at(-1)] = value; };
+
+    function render() {
+      data.fishing ??= { resistance: 3 };
+      document.querySelectorAll("[data-path]").forEach(input => input.value = get(input.dataset.path));
+      $("#skills").value = data.skills.join(", ");
+      $("#groups").innerHTML = data.skillGroups.map((g, i) => `<div class="row simple"><label>Group name<input data-array="skillGroups" data-index="${i}" data-key="name" value="${esc(g.name)}"></label><label>Items (comma separated)<input data-array="skillGroups" data-index="${i}" data-key="items" value="${esc(g.items.join(", "))}"></label><button class="remove" data-remove="skillGroups" data-index="${i}">remove</button></div>`).join("");
+      $("#featured").innerHTML = data.featuredProjects.map((p, i) => `<div class="row"><label>Name<input data-array="featuredProjects" data-index="${i}" data-key="name" value="${esc(p.name)}"></label><label>Description<textarea data-array="featuredProjects" data-index="${i}" data-key="description">${esc(p.description)}</textarea></label><label>Project link<input type="url" placeholder="https://..." data-array="featuredProjects" data-index="${i}" data-key="link" value="${esc(p.link)}"></label><label>Screenshot path<input data-array="featuredProjects" data-index="${i}" data-key="screenshot" value="${esc(p.screenshot)}"></label><button class="remove" data-remove="featuredProjects" data-index="${i}">remove</button></div>`).join("");
+      $("#other").innerHTML = data.otherProjects.map((p, i) => `<div class="row project"><label>Name<input data-array="otherProjects" data-index="${i}" data-key="name" value="${esc(p.name)}"></label><label>Description<textarea data-array="otherProjects" data-index="${i}" data-key="description">${esc(p.description)}</textarea></label><label>Project link<input type="url" placeholder="https://..." data-array="otherProjects" data-index="${i}" data-key="link" value="${esc(p.link)}"></label><button class="remove" data-remove="otherProjects" data-index="${i}">remove</button></div>`).join("");
+    }
+    document.addEventListener("input", (event) => {
+      const el = event.target;
+      if (el.dataset.path) set(el.dataset.path, el.type === "number" ? Number(el.value) : el.value);
+      if (el.id === "skills") data.skills = el.value.split(",").map(x => x.trim()).filter(Boolean);
+      if (el.dataset.array) data[el.dataset.array][Number(el.dataset.index)][el.dataset.key] = el.dataset.key === "items" ? el.value.split(",").map(x => x.trim()).filter(Boolean) : el.value;
+      status("Unsaved changes");
+    });
+    document.addEventListener("click", (event) => {
+      const button = event.target.closest("button"); if (!button) return;
+      if (button.dataset.remove) { data[button.dataset.remove].splice(Number(button.dataset.index), 1); render(); status("Unsaved changes"); }
+      if (button.dataset.add === "group") data.skillGroups.push({ name: "new group", items: [] });
+      if (button.dataset.add === "featured") data.featuredProjects.push({ name: "new-project", description: "", link: "", screenshot: "" });
+      if (button.dataset.add === "other") data.otherProjects.push({ name: "new-project", description: "", link: "" });
+      if (button.dataset.add) { render(); status("Unsaved changes"); }
+    });
+    $("#open").onclick = async () => {
+      try {
+        if (window.showOpenFilePicker) { [fileHandle] = await showOpenFilePicker({ types: [{ description: "JSON", accept: { "application/json": [".json"] } }] }); data = JSON.parse(await (await fileHandle.getFile()).text()); }
+        else { const input = Object.assign(document.createElement("input"), { type: "file", accept: ".json,application/json" }); input.onchange = async () => { data = JSON.parse(await input.files[0].text()); render(); status("Loaded " + input.files[0].name); }; input.click(); return; }
+        render(); status("Loaded site-config.json");
+      } catch (error) { if (error.name !== "AbortError") alert("Could not open that JSON file: " + error.message); }
+    };
+    $("#save").onclick = async () => {
+      const json = JSON.stringify(data, null, 2) + "\n";
+      try {
+        if (fileHandle?.createWritable) { const writable = await fileHandle.createWritable(); await writable.write(json); await writable.close(); status("Saved to current file"); return; }
+        const blob = new Blob([json], { type: "application/json" }); const a = Object.assign(document.createElement("a"), { href: URL.createObjectURL(blob), download: "site-config.json" }); a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 1000); status("Downloaded site-config.json");
+      } catch (error) { alert("Could not save: " + error.message); }
+    };
+    render();
+  </script>
+</body>
+</html>
