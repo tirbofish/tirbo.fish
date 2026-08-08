@@ -19,7 +19,7 @@ static_sites:
   build_command: npm ci && npm run build
   output_dir: dist
   index_document: index.html
-  error_document: index.html
+  catchall_document: index.html
   git:
     branch: main
     repo_clone_url: https://github.com/tirbofish/tirbo.fish.git
