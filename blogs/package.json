@@ -1,31 +1,38 @@
 {
-  "name": "tirbo.fish",
+  "name": "blogs.tirbo.fish",
   "private": true,
   "version": "0.0.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "dev:blogs": "npm run dev --prefix blogs",
     "build": "tsc -b && vite build",
-    "build:blogs": "npm run build --prefix blogs",
-    "lint": "oxlint",
     "preview": "vite preview",
-    "publish-post": "npm run publish-post --prefix blogs --",
-    "register-fido": "npm run register-fido --prefix blogs"
+    "publish-post": "node scripts/publish.mjs",
+    "register-fido": "node scripts/register-fido.mjs",
+    "worker:dev": "wrangler dev",
+    "worker:deploy": "wrangler deploy"
   },
   "dependencies": {
+    "@simplewebauthn/server": "^13.3.2",
     "@tailwindcss/vite": "^4.3.2",
+    "aws4fetch": "^1.0.20",
+    "dompurify": "^3.2.6",
+    "katex": "^0.16.22",
+    "marked": "^16.2.1",
+    "openpgp": "^6.1.1",
     "react": "^19.2.7",
     "react-dom": "^19.2.7",
     "tailwindcss": "^4.3.2"
   },
   "devDependencies": {
+    "@types/dompurify": "^3.2.0",
+    "@types/katex": "^0.16.7",
     "@types/node": "^24.13.2",
     "@types/react": "^19.2.17",
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^6.0.3",
-    "oxlint": "^1.71.0",
     "typescript": "~6.0.2",
-    "vite": "^8.1.1"
+    "vite": "^8.1.1",
+    "wrangler": "^4.28.0"
   }
 }

@@ -91,6 +91,7 @@ export function Landing({ config }: { config: SiteConfig }) {
         { label: "about", href: "#about" },
         { label: "skills", href: "#skills" },
         { label: "projects", href: "#projects" },
+        { label: "blogs", href: "https://blogs.tirbo.fish" },
         { label: "github", href: config.links.github },
         { label: "linkedin", href: config.links.linkedin },
         { label: "email", href: `mailto:${config.links.email}` },

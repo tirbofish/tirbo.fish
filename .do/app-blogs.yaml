@@ -1,0 +1,25 @@
+name: tirbo-blogs
+region: syd
+features:
+- buildpack-stack=ubuntu-22
+domains:
+- domain: blogs.tirbo.fish
+  type: PRIMARY
+  zone: tirbo.fish
+ingress:
+  rules:
+  - component:
+      name: blogs
+    match:
+      path:
+        prefix: /
+static_sites:
+- name: blogs
+  source_dir: blogs
+  build_command: npm ci && npm run build
+  output_dir: dist
+  index_document: index.html
+  error_document: index.html
+  git:
+    branch: main
+    repo_clone_url: https://github.com/tirbofish/tirbo.fish.git

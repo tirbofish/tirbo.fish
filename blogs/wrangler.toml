@@ -1,0 +1,13 @@
+name = "tirbo-blogs-api"
+main = "worker/index.ts"
+compatibility_date = "2025-08-01"
+
+# Set secrets via: wrangler secret put OWNER_PUBLIC_KEY
+# and vars for S3 in the Cloudflare dashboard / wrangler.toml [vars]
+
+[vars]
+MAX_SKEW_MS = "300000"
+# S3_ENDPOINT = "https://nyc3.digitaloceanspaces.com"
+# S3_REGION = "nyc3"
+# S3_BUCKET = "tirbo-blogs"
+# S3_PUBLIC_BASE_URL = "https://tirbo-blogs.nyc3.cdn.digitaloceanspaces.com"
