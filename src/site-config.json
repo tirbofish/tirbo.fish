@@ -2,11 +2,11 @@
   "name": "Thribhu K",
   "handle": "::<tirbofish>",
   "birthDate": "2009-01-01",
-  "about": "I'm a {age} year old student software developer interested in systems, graphics, game dev and full-stack apps.",
+  "about": "I'm a {age} year old student interested in systems, graphics, game dev and full-stack apps.",
   "links": {
     "github": "https://github.com/tirbofish",
     "linkedin": "https://www.linkedin.com/in/thribhu-krishnan-1a3b60333/",
-    "email": "thribhu.krishnan@proton.me",
+    "email": "me@tirbo.fish",
     "resume": "/resume.pdf"
   },
   "fishing": { "resistance": 1e+24 },
