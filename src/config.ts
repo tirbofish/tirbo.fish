@@ -5,7 +5,7 @@ export type SiteConfig = {
     handle: string;
     birthDate: string;
     about: string;
-    links: { github: string; linkedin: string; email: string; resume: string };
+    links: { github: string; linkedin: string; matrix: string; email: string; resume: string };
     fishing?: { resistance: number };
     skills: string[];
     skillGroups: SkillGroup[];

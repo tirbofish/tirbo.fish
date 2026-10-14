@@ -6,6 +6,7 @@ import { Skills } from "./Skills";
 import TirboFish from "./TirboFish";
 import { FishingGame } from "./FishingGame";
 import { readHiScore } from "./hiScore";
+import { LinkIcon, type LinkIconName } from "./LinkIcon";
 
 const WHEEL_PULL_TARGET = 2000; // roughly 20 standard upward wheel movements
 const TOUCH_PULL_TARGET = 240; // px of downward drag at the top of the page
@@ -92,10 +93,13 @@ export function Landing({ config }: { config: SiteConfig }) {
         { label: "skills", href: "#skills" },
         { label: "projects", href: "#projects" },
         { label: "blogs", href: "https://blogs.tirbo.fish" },
-        { label: "github", href: config.links.github },
-        { label: "linkedin", href: config.links.linkedin },
-        { label: "email", href: `mailto:${config.links.email}` },
         { label: "resume", href: config.links.resume },
+    ];
+    const iconLinks: { icon: LinkIconName; label: string; href: string }[] = [
+        { icon: "github", label: "GitHub", href: config.links.github },
+        { icon: "linkedin", label: "LinkedIn", href: config.links.linkedin },
+        { icon: "matrix", label: "Matrix", href: config.links.matrix },
+        { icon: "email", label: "Email", href: `mailto:${config.links.email}` },
     ];
 
     const scrollToSection = (href: string) => {
@@ -122,6 +126,18 @@ export function Landing({ config }: { config: SiteConfig }) {
                                     } : undefined}
                                 >
                                     {link.label}
+                                </a>
+                            </li>
+                        ))}
+                        {iconLinks.map((link) => (
+                            <li key={link.icon}>
+                                <a
+                                    className="flex text-inherit opacity-80 outline-offset-[0.35em] hover:opacity-100 focus-visible:rounded-[0.15em] focus-visible:outline-2 focus-visible:outline-current"
+                                    href={link.href}
+                                    aria-label={link.label}
+                                    title={link.label}
+                                >
+                                    <LinkIcon name={link.icon} />
                                 </a>
                             </li>
                         ))}

@@ -4,6 +4,7 @@ import { Landing } from './Landing'
 import { loadSiteConfig, type SiteConfig } from './config'
 
 const viewRevealDelay = 700
+const autoEnterDelay = 5000
 
 function App() {
   const [isExpanding, setIsExpanding] = useState(false)
@@ -14,6 +15,12 @@ function App() {
   useEffect(() => {
     loadSiteConfig().then(setConfig).catch(() => setConfigError(true))
   }, [])
+
+  useEffect(() => {
+    if (isExpanding) return
+    const timeout = window.setTimeout(() => setIsExpanding(true), autoEnterDelay)
+    return () => window.clearTimeout(timeout)
+  }, [isExpanding])
 
   useEffect(() => {
     if (!isExpanding) return
